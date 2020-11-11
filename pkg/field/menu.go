@@ -5,11 +5,11 @@ import (
 )
 
 type GetDishRequest struct {
-	Id int `json:"id" binding:"required"`
+	Id string `json:"id" binding:"required"`
 }
 
 type GetDishResponse struct {
-	Id int `json:"id"`
+	Id string `json:"id"`
 
 }
 

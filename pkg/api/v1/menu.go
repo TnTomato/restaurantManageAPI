@@ -2,11 +2,9 @@ package v1
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
-	"strconv"
-
-	"github.com/gin-gonic/gin"
 
 	dishField "restaurantManageAPI/pkg/field"
 	dishModel "restaurantManageAPI/pkg/model"
@@ -19,18 +17,9 @@ var ok bool
 
 func GetDish(context *gin.Context) {
 	getDishRequest := new(dishField.GetDishRequest)
-	if getDishRequest.Id, err = strconv.Atoi(context.Param("id")); err != nil {
-		log.Println(err)
-		code = response.ResponseInvalidParams
-		context.JSON(http.StatusOK, gin.H{
-			"code": code,
-			"msg":  err.Error(),
-		})
-	} else {
-		dish := dishModel.GetDish(getDishRequest.Id)
-		fmt.Print(dish)
-	}
-
+	getDishRequest.Id = context.Param("id")
+	dish := dishModel.GetDish(getDishRequest.Id)
+	fmt.Print(dish)
 }
 
 func AddDish(context *gin.Context) {

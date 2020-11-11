@@ -9,9 +9,9 @@ type MenuType struct {
 type Menu struct {
 	BaseModel
 
-	TypeId int `gorm:"comment:'id of menu_type'" json:"type_id"`
-	DishId int `gorm:"comment:'id of dish'" json:"dish_id"`
-	Order int `gorm:"comment:'The rank of the dish under the same type'" json:"order"`
+	TypeId string `gorm:"type:varchar(24);comment:'id of menu_type'" json:"type_id"`
+	DishId string `gorm:"type:varchar(24);comment:'id of dish'" json:"dish_id"`
+	Order int8 `gorm:"comment:'The rank of the dish under the same type'" json:"order"`
 }
 
 type Dish struct {
@@ -24,7 +24,7 @@ type Dish struct {
 	Cost        uint16 `gorm:"comment:'The cost price of the dish'" json:"cost"`
 }
 
-func GetDish(id int) (dish Dish) {
+func GetDish(id string) (dish Dish) {
 	//TODO: https://gorm.io/docs/query.html
 	DB.First(&dish, id)
 	return
@@ -32,10 +32,12 @@ func GetDish(id int) (dish Dish) {
 
 func (d *Dish) Create() (error, bool) {
 	// TODO: The auto-increase primary key keep increasing after db error happen with no new row inserted
-	result := DB.Create(d)
-	if result.Error != nil {
-		return result.Error, false
+	tx := DB.Begin()
+	if err := tx.Create(d).Error; err != nil {
+		tx.Rollback()
+		return err, false
 	} else {
+		tx.Commit()
 		return nil, true
 	}
 }
