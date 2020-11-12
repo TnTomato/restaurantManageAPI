@@ -11,7 +11,7 @@ type Menu struct {
 
 	TypeId string `gorm:"type:varchar(24);comment:'id of menu_type'" json:"type_id"`
 	DishId string `gorm:"type:varchar(24);comment:'id of dish'" json:"dish_id"`
-	Order int8 `gorm:"comment:'The rank of the dish under the same type'" json:"order"`
+	Order  int8   `gorm:"comment:'The rank of the dish under the same type'" json:"order"`
 }
 
 type Dish struct {

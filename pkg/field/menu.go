@@ -10,7 +10,6 @@ type GetDishRequest struct {
 
 type GetDishResponse struct {
 	Id string `json:"id"`
-
 }
 
 type AddDishRequest struct {
