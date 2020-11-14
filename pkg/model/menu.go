@@ -31,7 +31,6 @@ func GetDish(id string) (dish Dish) {
 }
 
 func (d *Dish) Create() (error, bool) {
-	// TODO: The auto-increase primary key keep increasing after db error happen with no new row inserted
 	tx := DB.Begin()
 	if err := tx.Create(d).Error; err != nil {
 		tx.Rollback()
