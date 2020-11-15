@@ -26,7 +26,7 @@ type Dish struct {
 
 func GetDish(id string) (dish Dish) {
 	//TODO: https://gorm.io/docs/query.html
-	DB.First(&dish, id)
+	DB.Where("id = ?", id).First(&dish)
 	return
 }
 

@@ -1,11 +1,9 @@
 package v1
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
-
 	dishField "restaurantManageAPI/pkg/field"
 	dishModel "restaurantManageAPI/pkg/model"
 	"restaurantManageAPI/pkg/util/response"
@@ -19,7 +17,15 @@ func GetDish(context *gin.Context) {
 	getDishRequest := new(dishField.GetDishRequest)
 	getDishRequest.Id = context.Param("id")
 	dish := dishModel.GetDish(getDishRequest.Id)
-	fmt.Print(dish)
+	getDishResponse := dishField.GetDishResponse{
+		Id: dish.Id,
+		Name: dish.Name,
+	}
+	context.JSON(http.StatusOK, gin.H{
+		"code": 200,
+		"msg": "OK",
+		"data": getDishResponse,
+	})
 }
 
 func AddDish(context *gin.Context) {
