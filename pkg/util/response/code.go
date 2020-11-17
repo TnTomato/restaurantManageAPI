@@ -1,8 +1,9 @@
 package response
 
 const (
-	ResponseOK            = 200
-	ResponseError         = 500
-	ResponseInvalidParams = 400
-	DBError               = 10001
+	OK            = 200
+	Error         = 500
+	InvalidParams = 400
+	NotFound      = 404
+	DBError       = 10001
 )

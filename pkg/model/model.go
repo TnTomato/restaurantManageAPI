@@ -49,11 +49,13 @@ func init() {
 		log.Fatal(err)
 	}
 
+	DB.LogMode(true)
+
 	DB.DB().SetMaxIdleConns(10)
 	DB.DB().SetMaxOpenConns(100)
 
 	DB.SingularTable(true)
 
-	DB.DropTableIfExists(MenuType{}, Menu{}, Dish{})
-	DB.CreateTable(MenuType{}, Menu{}, Dish{})
+	//DB.DropTableIfExists(MenuType{}, Menu{}, Dish{})
+	//DB.CreateTable(MenuType{}, Menu{}, Dish{})
 }

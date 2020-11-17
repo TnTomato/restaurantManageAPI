@@ -5,17 +5,23 @@ import (
 	"net/http"
 )
 
-func EmptySuccessResp(context *gin.Context) {
+var SuccessJson = gin.H{
+	"code": 200,
+	"msg": "OK",
+}
+
+func Success(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{
-		"code": ResponseOK,
-		"msg":  ResponseMsg(ResponseOK),
+		"code": OK,
+		"msg":  ResponseMsg(OK),
+		"data": nil,
 	})
 }
 
-func SuccessResp(context *gin.Context, ) {
+func CustomResponse(context *gin.Context, code int, msg string, data ...interface{}) {
 	context.JSON(http.StatusOK, gin.H{
-		"code": ResponseOK,
-		"msg":  ResponseMsg(ResponseOK),
-		"data": nil,
+		"code": code,
+		"msg":  msg,
+		"data": data,
 	})
 }

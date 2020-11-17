@@ -9,8 +9,12 @@ type GetDishRequest struct {
 }
 
 type GetDishResponse struct {
-	Id string `json:"id"`
-	Name string `json:"name"`
+	Id          string `json:"id"`
+	Name        string `json:"name"`
+	Price       uint16 `json:"price"`
+	Description string `json:"description"`
+	WayToCook   string `json:"way_to_cook"`
+	Cost        uint16 `json:"cost"`
 }
 
 type AddDishRequest struct {
@@ -19,6 +23,10 @@ type AddDishRequest struct {
 	Description string `json:"description"`
 	WayToCook   string `json:"way_to_cook"`
 	Cost        uint16 `json:"cost"`
+}
+
+type UpdateDishRequest struct {
+	AddDishRequest
 }
 
 func NameValidator(fl validator.FieldLevel) bool {

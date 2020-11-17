@@ -2,64 +2,114 @@ package v1
 
 import (
 	"github.com/gin-gonic/gin"
-	"log"
 	"net/http"
-	dishField "restaurantManageAPI/pkg/field"
-	dishModel "restaurantManageAPI/pkg/model"
+
+	"restaurantManageAPI/pkg/field"
+	"restaurantManageAPI/pkg/model"
 	"restaurantManageAPI/pkg/util/response"
 )
 
-var code int
-var err error
-var ok bool
-
 func GetDish(context *gin.Context) {
-	getDishRequest := new(dishField.GetDishRequest)
+	var result gin.H
+
+	getDishRequest := new(field.GetDishRequest)
 	getDishRequest.Id = context.Param("id")
-	dish := dishModel.GetDish(getDishRequest.Id)
-	getDishResponse := dishField.GetDishResponse{
-		Id: dish.Id,
-		Name: dish.Name,
+
+	if dish, ok := model.GetDish(getDishRequest.Id); ok {
+		getDishResponse := field.GetDishResponse{
+			Id:   dish.Id,
+			Name: dish.Name,
+			Price: dish.Price,
+			Description: dish.Description,
+			WayToCook: dish.WayToCook,
+			Cost: dish.Cost,
+		}
+		result = gin.H{
+			"code": response.OK,
+			"msg": response.ResponseMsg(response.OK),
+			"data": getDishResponse,
+		}
+	} else {
+		result = gin.H{
+			"code": response.NotFound,
+			"msg": response.ResponseMsg(response.NotFound),
+		}
 	}
-	context.JSON(http.StatusOK, gin.H{
-		"code": 200,
-		"msg": "OK",
-		"data": getDishResponse,
-	})
+
+	context.JSON(http.StatusOK, result)
 }
 
 func AddDish(context *gin.Context) {
-	var addDishRequest dishField.AddDishRequest
+	var result gin.H
+	var err error
+	var ok bool
+
+	var addDishRequest field.AddDishRequest
 
 	if err = context.ShouldBindJSON(&addDishRequest); err != nil {
-		log.Println(err)
-		code = response.ResponseInvalidParams
-		context.JSON(http.StatusOK, gin.H{
-			"code": code,
-			"msg":  err.Error(),
-		})
+		result = gin.H{
+			"code": response.InvalidParams,
+			"msg": err.Error(),
+		}
 	} else {
-		dish := dishModel.Dish{
+		dish := model.Dish{
 			Name:        addDishRequest.Name,
 			Price:       addDishRequest.Price,
 			Description: addDishRequest.Description,
 			WayToCook:   addDishRequest.WayToCook,
 			Cost:        addDishRequest.Cost,
 		}
-		if err, ok = dish.Create(); !ok {
-			code = response.DBError
-			context.JSON(http.StatusOK, gin.H{
-				"code": code,
-				"msg":  err.Error(),
-			})
+		if err, ok = model.AddDish(&dish); !ok {
+			result = gin.H{
+				"code": response.DBError,
+				"msg": err.Error(),
+			}
 		} else {
-			response.EmptySuccessResp(context)
+			result = response.SuccessJson
 		}
 	}
+
+	context.JSON(http.StatusOK, result)
 }
 
 func UpdateDish(context *gin.Context) {
+	// TODO: optimize model func
+	var err error
+	var code int
+	var updateDishRequest field.UpdateDishRequest
+	var dish4Update model.Dish
+	var dish4Check model.Dish
 
+	id := context.Param("id")
+
+	if err = context.ShouldBindJSON(&updateDishRequest); err != nil {
+		code = response.InvalidParams
+		response.CustomResponse(context, code, err.Error())
+	} else {
+		findNum := model.DB.First(&dish4Update, "id = ?", id).RowsAffected
+		if findNum != 1 {
+			code = response.InvalidParams
+			response.CustomResponse(context, code, "Invalid id, resource not found")
+		} else {
+			findNum = model.DB.Where("name = ?", updateDishRequest.Name).First(&dish4Check).RowsAffected
+			if findNum == 1 {
+				code = response.InvalidParams
+				response.CustomResponse(context, code, "Duplicated dish name")
+			} else {
+				dish4Update.Name = updateDishRequest.Name
+				dish4Update.Price = updateDishRequest.Price
+				dish4Update.Description = updateDishRequest.Description
+				dish4Update.WayToCook = updateDishRequest.WayToCook
+				dish4Update.Cost = updateDishRequest.Cost
+				if err = model.DB.Save(&dish4Update).Error; err != nil {
+					code = response.InvalidParams
+					response.CustomResponse(context, code, err.Error())
+				} else {
+					response.Success(context)
+				}
+			}
+		}
+	}
 }
 
 func DeleteDish(context *gin.Context) {

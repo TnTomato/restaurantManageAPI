@@ -1,5 +1,7 @@
 package model
 
+import "errors"
+
 type MenuType struct {
 	BaseModel
 
@@ -17,16 +19,35 @@ type Menu struct {
 type Dish struct {
 	BaseModel
 
-	Name        string `gorm:"unique;comment:'Name of the dish'" json:"name"`
+	Name        string `gorm:"comment:'Name of the dish'" json:"name"`
 	Price       uint16 `gorm:"comment:'Price of the dish'" json:"price"`
 	Description string `gorm:"comment:'Description of the dish'" json:"description"`
 	WayToCook   string `gorm:"comment:'How to cook'" json:"way_to_cook"`
 	Cost        uint16 `gorm:"comment:'The cost price of the dish'" json:"cost"`
 }
 
-func GetDish(id string) (dish Dish) {
-	//TODO: https://gorm.io/docs/query.html
-	DB.Where("id = ?", id).First(&dish)
+func GetDish(id string) (dish Dish, state bool) {
+	rowAffected := DB.Where("id = ?", id).First(&dish).RowsAffected
+	if rowAffected == 1 {
+		state = true
+	} else {
+		state = false
+	}
+	return
+}
+
+func AddDish(d *Dish) (err error, state bool) {
+	var foundDish Dish
+	if rowsAffected := DB.Where("name = ?", d.Name).First(&foundDish).RowsAffected; rowsAffected >= 1 {
+		err = errors.New("duplicated name")
+		state = false
+	} else {
+		if err := DB.Create(d).Error; err != nil {
+			state = false
+		} else {
+			state = true
+		}
+	}
 	return
 }
 
