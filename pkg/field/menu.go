@@ -29,6 +29,10 @@ type UpdateDishRequest struct {
 	AddDishRequest
 }
 
+type DeleteDishRequest struct {
+	GetDishRequest
+}
+
 func NameValidator(fl validator.FieldLevel) bool {
 	if name, ok := fl.Field().Interface().(string); ok {
 		if name == "什么哩个东西" {

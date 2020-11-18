@@ -42,7 +42,9 @@ func FindDishById(id string) (dish Dish, state bool) {
 
 func CreateDish(d *Dish) (err error, status int) {
 	var foundDish Dish
-	if rowsAffected := DB.Where("name = ?", d.Name).First(&foundDish).RowsAffected; rowsAffected >= 1 {
+	if rowsAffected := DB.Where(
+		"name = ? and is_enable = ?", d.Name, 1).First(
+			&foundDish).RowsAffected; rowsAffected >= 1 {
 		err = errors.New("duplicated name")
 		status = response.DuplicatedName
 	} else {
@@ -63,7 +65,7 @@ func UpdateDishById(id string, request field.UpdateDishRequest) (err error, stat
 	if foundNum != 1 {
 		status = response.NotFound
 	} else {
-		foundNum = DB.Where("name = ?", request.Name).First(&dish4Check).RowsAffected
+		foundNum = DB.Where("name = ? and is_enable = ?", request.Name, 1).First(&dish4Check).RowsAffected
 		if foundNum == 1 && dish4Check.Id != id{
 			status = response.InvalidParams
 			err = errors.New("duplicated name")
@@ -78,6 +80,23 @@ func UpdateDishById(id string, request field.UpdateDishRequest) (err error, stat
 			} else {
 				status = response.OK
 			}
+		}
+	}
+	return
+}
+
+func DeleteDishById(id string) (err error, status int) {
+	var dish4Update Dish
+
+	foundNum := DB.First(&dish4Update, "id = ? and is_enable = ?", id, 1).RowsAffected
+	if foundNum != 1 {
+		status = response.NotFound
+	} else {
+		dish4Update.IsEnable = 0
+		if err = DB.Save(&dish4Update).Error; err != nil {
+			status = response.InvalidParams
+		} else {
+			status = response.OK
 		}
 	}
 	return

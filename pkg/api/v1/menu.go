@@ -114,7 +114,29 @@ func UpdateDish(context *gin.Context) {
 }
 
 func DeleteDish(context *gin.Context) {
+	var result gin.H
+	var err error
+	var status int
 
+	deleteDishRequest := new(field.DeleteDishRequest)
+	deleteDishRequest.Id = context.Param("id")
+
+	switch err, status = model.DeleteDishById(deleteDishRequest.Id); status {
+	case response.OK:
+		result = response.SuccessJson
+	case response.NotFound:
+		result = gin.H{
+			"code": status,
+			"msg": response.ResponseMsg(status),
+		}
+	case response.InvalidParams:
+		result = gin.H{
+			"code": status,
+			"msg": err.Error(),
+		}
+	}
+
+	context.JSON(http.StatusOK, result)
 }
 
 func GetMenu(context *gin.Context) {
