@@ -1,13 +1,15 @@
 package router
 
 import (
-	"github.com/gin-gonic/gin/binding"
-	"github.com/go-playground/validator/v10"
 	"os"
-	v1 "restaurantManageAPI/pkg/api/v1"
-	"restaurantManageAPI/pkg/field"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
+
+	v1 "restaurantManageAPI/pkg/api/v1"
+	"restaurantManageAPI/pkg/field"
+	"restaurantManageAPI/pkg/middleware"
 )
 
 var Router *gin.Engine
@@ -15,6 +17,7 @@ var Router *gin.Engine
 func init() {
 	Router = gin.New()
 	Router.Use(gin.Logger(), gin.Recovery())
+	Router.Use(middleware.NotFoundHander())
 	gin.SetMode(os.Getenv("GIN_MODE"))
 
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {

@@ -1,6 +1,10 @@
 package model
 
-import "errors"
+import (
+	"errors"
+	"restaurantManageAPI/pkg/field"
+	"restaurantManageAPI/pkg/util/response"
+)
 
 type MenuType struct {
 	BaseModel
@@ -26,7 +30,7 @@ type Dish struct {
 	Cost        uint16 `gorm:"comment:'The cost price of the dish'" json:"cost"`
 }
 
-func GetDish(id string) (dish Dish, state bool) {
+func FindDishById(id string) (dish Dish, state bool) {
 	rowAffected := DB.Where("id = ?", id).First(&dish).RowsAffected
 	if rowAffected == 1 {
 		state = true
@@ -36,32 +40,45 @@ func GetDish(id string) (dish Dish, state bool) {
 	return
 }
 
-func AddDish(d *Dish) (err error, state bool) {
+func CreateDish(d *Dish) (err error, status int) {
 	var foundDish Dish
 	if rowsAffected := DB.Where("name = ?", d.Name).First(&foundDish).RowsAffected; rowsAffected >= 1 {
 		err = errors.New("duplicated name")
-		state = false
+		status = response.DuplicatedName
 	} else {
 		if err := DB.Create(d).Error; err != nil {
-			state = false
+			status = response.DBError
 		} else {
-			state = true
+			status = response.OK
 		}
 	}
 	return
 }
 
-func (d *Dish) Create() (error, bool) {
-	tx := DB.Begin()
-	if err := tx.Create(d).Error; err != nil {
-		tx.Rollback()
-		return err, false
-	} else {
-		tx.Commit()
-		return nil, true
-	}
-}
+func UpdateDishById(id string, request field.UpdateDishRequest) (err error, status int) {
+	var dish4Update Dish
+	var dish4Check Dish
 
-func (d *Dish) String() string {
-	return d.Name
+	foundNum := DB.First(&dish4Update, "id = ?", id).RowsAffected
+	if foundNum != 1 {
+		status = response.NotFound
+	} else {
+		foundNum = DB.Where("name = ?", request.Name).First(&dish4Check).RowsAffected
+		if foundNum == 1 && dish4Check.Id != id{
+			status = response.InvalidParams
+			err = errors.New("duplicated name")
+		} else {
+			dish4Update.Name = request.Name
+			dish4Update.Price = request.Price
+			dish4Update.Description = request.Description
+			dish4Update.WayToCook = request.WayToCook
+			dish4Update.Cost = request.Cost
+			if err = DB.Save(&dish4Update).Error; err != nil {
+				status = response.InvalidParams
+			} else {
+				status = response.OK
+			}
+		}
+	}
+	return
 }

@@ -20,15 +20,15 @@ type BaseModel struct {
 	IsEnable  int8   `gorm:"default:1;comment:'To indicate logically deleted rows'" json:"is_enable"`
 }
 
-func (model *BaseModel) BeforeCreate(scope *gorm.Scope) error {
+func (model *BaseModel) BeforeCreate(scope *gorm.Scope) (err error) {
 	scope.SetColumn("Id", bson.NewObjectId().Hex())
 	scope.SetColumn("CreatedAt", time.Now().Unix())
-	return nil
+	return
 }
 
-func (model *BaseModel) BeforeUpdate(scope *gorm.Scope) error {
+func (model *BaseModel) BeforeUpdate(scope *gorm.Scope) (err error) {
 	scope.SetColumn("UpdatedAt", time.Now().Unix())
-	return nil
+	return
 }
 
 func init() {
