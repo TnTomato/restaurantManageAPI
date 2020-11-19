@@ -49,6 +49,7 @@ func init() {
 		log.Fatal(err)
 	}
 
+	// To show SQL
 	DB.LogMode(true)
 
 	DB.DB().SetMaxIdleConns(10)
