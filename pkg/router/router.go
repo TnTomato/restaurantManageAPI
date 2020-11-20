@@ -18,7 +18,7 @@ func init() {
 	Router = gin.New()
 	Router.Use(gin.Logger(), gin.Recovery())
 	Router.Use(middleware.NotFoundHander())
-	gin.SetMode(os.Getenv("GIN_MODE"))
+	gin.SetMode(os.Getenv(gin.EnvGinMode))
 
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		v.RegisterValidation("NameValidator", field.NameValidator)
