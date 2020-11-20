@@ -17,7 +17,7 @@ var Router *gin.Engine
 func init() {
 	Router = gin.New()
 	Router.Use(gin.Logger(), gin.Recovery())
-	Router.Use(middleware.NotFoundHander())
+	Router.Use(middleware.NotFoundHandler())
 	gin.SetMode(os.Getenv(gin.EnvGinMode))
 
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {

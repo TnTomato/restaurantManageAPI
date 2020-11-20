@@ -6,7 +6,7 @@ import (
 	"restaurantManageAPI/pkg/util/response"
 )
 
-func NotFoundHander() gin.HandlerFunc {
+func NotFoundHandler() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		context.Next()
 		status := context.Writer.Status()
