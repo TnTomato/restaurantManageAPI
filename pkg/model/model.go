@@ -26,6 +26,7 @@ func (model *BaseModel) BeforeCreate(scope *gorm.Scope) (err error) {
 	return
 }
 
+// Bulk update will not trigger this hook
 func (model *BaseModel) BeforeUpdate(scope *gorm.Scope) (err error) {
 	scope.SetColumn("UpdatedAt", time.Now().Unix())
 	return
