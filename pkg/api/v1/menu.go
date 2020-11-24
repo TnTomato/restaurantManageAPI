@@ -139,6 +139,18 @@ func DeleteDish(context *gin.Context) {
 	context.JSON(http.StatusOK, result)
 }
 
+func AddMenuType(context *gin.Context) {
+
+}
+
+func UpdateMenuType(context *gin.Context) {
+
+}
+
+func GetMenuTypes(context *gin.Context) {
+	
+}
+
 func GetMenu(context *gin.Context) {
 
 }
